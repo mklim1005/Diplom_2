@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 
+import static helpers.AuthHelper.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -21,54 +22,27 @@ public class TestLogInUser {
     public void setUp() {
         user = new User(email, password, name);
         RestAssured.baseURI = "https://stellarburgers.nomoreparties.site";
-        Response response = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(user)
-                .when()
-                .post("/api/auth/register");
-        response.then().assertThat().statusCode(200)
-                .and()
-                .assertThat().body("success", equalTo(true));
+     register(user).then().assertThat().statusCode(200);
     }
 
     @After
     public void deleteUser() {
-        Response responseLogin = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(user)
-                .when()
-                .post("/api/auth/login");
-        String accessToken;
-        accessToken = responseLogin.body().jsonPath().getString("accessToken");
+        String accessToken = loginAndGetToken(user);
 
         if (accessToken == null) {
             System.out.println("Skip delete user");
         } else {
-            Response responseDelete = given()
-                    .header("Authorization", accessToken)
-                    .delete("/api/auth/user");
-            responseDelete.then().assertThat().statusCode(202)
-                    .and()
-                    .assertThat().body("success", equalTo(true))
-                    .and()
-                    .assertThat().body("message", equalTo("User successfully removed"));
+            delete(accessToken).then().assertThat().statusCode(202);
         }
     }
 
     @Test
     public void testLogInExistingUser() {
-        Response responseLogin = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(user)
-                .when()
-                .post("/api/auth/login");
-        responseLogin.then().assertThat().statusCode(200)
-                .and()
+        Response responseLogin = login(user);
+
+        responseLogin.then()
+                .assertThat().statusCode(200)
                 .assertThat().body("user.email", equalTo(user.getEmail().toLowerCase()))
-                .and()
                 .assertThat().body("user.name", equalTo(user.getName()));
 
     }
@@ -76,32 +50,22 @@ public class TestLogInUser {
     @Test
     public void testLogInWrongEmail() {
         user.setEmail("");
-        Response responseLogin = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(user)
-                .when()
-                .post("/api/auth/login");
-        responseLogin.then().assertThat().statusCode(401)
-                .and()
+        Response responseLogin = login(user);
+
+        responseLogin.then()
+                .assertThat().statusCode(401)
                 .assertThat().body("success", equalTo(false))
-                .and()
                 .assertThat().body("message", equalTo("email or password are incorrect"));
     }
 
     @Test
     public void testLogInWrongPassword() {
         user.setPassword("");
-        Response responseLogin = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(user)
-                .when()
-                .post("/api/auth/login");
-        responseLogin.then().assertThat().statusCode(401)
-                .and()
+        Response responseLogin = login(user);
+
+        responseLogin.then()
+                .assertThat().statusCode(401)
                 .assertThat().body("success", equalTo(false))
-                .and()
                 .assertThat().body("message", equalTo("email or password are incorrect"));
     }
 }
