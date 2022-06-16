@@ -27,7 +27,7 @@ public class TestChangeUserData {
 
     @After
     public void deleteUser() {
-        String accessToken = loginAndGetToken(user);
+        String accessToken = AuthHelper.loginAndGetToken(user);
         if (accessToken == null) {
             System.out.println("Skip delete user");
         } else {
@@ -38,21 +38,9 @@ public class TestChangeUserData {
         }
     }
 
-    private Response login(User user) {
-        return given()
-                .header("Content-type", "application/json")
-                .body(user)
-                .post("/api/auth/login");
-    }
-
-    private String loginAndGetToken(User user) {
-        Response response = login(user);
-        return response.body().jsonPath().getString("accessToken");
-    }
-
     @Test
     public void testChangeUserDataNameAuthorized() {
-        String accessToken = loginAndGetToken(user);
+        String accessToken = AuthHelper.loginAndGetToken(user);
         String newName = RandomStringUtils.randomAlphabetic(10);
 
         Response response = given()
@@ -69,7 +57,7 @@ public class TestChangeUserData {
 
     @Test
     public void testChangeUserDataEmailAuthorized() {
-        String accessToken = loginAndGetToken(user);
+        String accessToken = AuthHelper.loginAndGetToken(user);
         String newEmail = RandomStringUtils.randomAlphabetic(10) + "@mailinator.com";
 
         Response response = given()

@@ -1,0 +1,18 @@
+import io.restassured.response.Response;
+
+import static io.restassured.RestAssured.given;
+
+public class AuthHelper {
+    public static Response login(User user) {
+        return given()
+                .header("Content-type", "application/json")
+                .body(user)
+                .post("/api/auth/login");
+    }
+
+    public static String loginAndGetToken(User user) {
+        Response response = login(user);
+        return response.body().jsonPath().getString("accessToken");
+    }
+
+}
