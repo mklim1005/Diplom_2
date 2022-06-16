@@ -14,6 +14,12 @@ public class AuthHelper {
                 .post("/api/auth/register");
     }
 
+    public static Response delete(String accessToken) {
+        return given()
+                .header("Authorization", accessToken)
+                .delete("/api/auth/user");
+    }
+
     public static Response login(User user) {
         return given()
                 .header("Content-type", "application/json")

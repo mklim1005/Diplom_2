@@ -11,6 +11,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static helpers.AuthHelper.loginAndGetToken;
 import static helpers.AuthHelper.register;
+import static helpers.AuthHelper.delete;
 
 public class TestChangeUserData {
     public String email = RandomStringUtils.randomAlphabetic(10) + "@mailinator.com";
@@ -31,10 +32,7 @@ public class TestChangeUserData {
         if (accessToken == null) {
             System.out.println("Skip delete user");
         } else {
-            given()
-                    .header("Authorization", accessToken)
-                    .delete("/api/auth/user")
-                    .then().assertThat().statusCode(202);
+            delete(accessToken).then().assertThat().statusCode(202);
         }
     }
 

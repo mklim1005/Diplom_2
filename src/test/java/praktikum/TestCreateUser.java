@@ -8,9 +8,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static helpers.AuthHelper.register;
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static helpers.AuthHelper.loginAndGetToken;
+import static helpers.AuthHelper.delete;
 
 public class TestCreateUser {
     public String email = RandomStringUtils.randomAlphabetic(10) + "@mailinator.com";
@@ -27,14 +27,10 @@ public class TestCreateUser {
     @After
     public void deleteUser() {
         String accessToken = loginAndGetToken(user);
-
         if (accessToken == null) {
             System.out.println("Skip delete user");
         } else {
-            given()
-                    .header("Authorization", accessToken)
-                    .delete("/api/auth/user")
-                    .then().assertThat().statusCode(202);
+            delete(accessToken).then().assertThat().statusCode(202);
         }
     }
 
@@ -62,6 +58,7 @@ public class TestCreateUser {
     @Test
     public void testCreateUserNotFillEmail() {
         user.setEmail("");
+
         Response response = register(user);
 
         response.then()
@@ -73,6 +70,7 @@ public class TestCreateUser {
     @Test
     public void testCreateUserNotFillPassword() {
         user.setPassword("");
+
         Response response = register(user);
 
         response.then()
@@ -84,6 +82,7 @@ public class TestCreateUser {
     @Test
     public void testCreateUserNotFillName() {
         user.setName("");
+
         Response response = register(user);
 
         response.then()
