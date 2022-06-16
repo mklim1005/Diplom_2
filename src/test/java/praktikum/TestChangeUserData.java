@@ -10,6 +10,7 @@ import org.junit.Test;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static helpers.AuthHelper.loginAndGetToken;
+import static helpers.AuthHelper.register;
 
 public class TestChangeUserData {
     public String email = RandomStringUtils.randomAlphabetic(10) + "@mailinator.com";
@@ -21,11 +22,7 @@ public class TestChangeUserData {
     public void setUp() {
         user = new User(email, password, name);
         RestAssured.baseURI = "https://stellarburgers.nomoreparties.site";
-        given()
-                .header("Content-type", "application/json")
-                .body(user)
-                .post("/api/auth/register")
-                .then().assertThat().statusCode(200);
+        register(user).then().assertThat().statusCode(200);
     }
 
     @After

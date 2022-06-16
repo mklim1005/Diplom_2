@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static helpers.AuthHelper.register;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static helpers.AuthHelper.loginAndGetToken;
@@ -39,10 +40,7 @@ public class TestCreateUser {
 
     @Test
     public void testCreateUniqueUser() {
-        Response response = given()
-                .header("Content-type", "application/json")
-                .body(user)
-                .post("/api/auth/register");
+        Response response = register(user);
 
         response.then()
                 .assertThat().statusCode(200)
@@ -51,15 +49,9 @@ public class TestCreateUser {
 
     @Test
     public void testCreateUserThatAlreadyExists() {
-        given()
-                .header("Content-type", "application/json")
-                .body(user)
-                .post("/api/auth/register");
+        register(user);
 
-        Response response = given()
-                .header("Content-type", "application/json")
-                .body(user)
-                .post("/api/auth/register");
+        Response response = register(user);
 
         response.then()
                 .assertThat().statusCode(403)
@@ -70,10 +62,7 @@ public class TestCreateUser {
     @Test
     public void testCreateUserNotFillEmail() {
         user.setEmail("");
-        Response response = given()
-                .header("Content-type", "application/json")
-                .body(user)
-                .post("/api/auth/register");
+        Response response = register(user);
 
         response.then()
                 .assertThat().statusCode(403)
@@ -84,10 +73,7 @@ public class TestCreateUser {
     @Test
     public void testCreateUserNotFillPassword() {
         user.setPassword("");
-        Response response = given()
-                .header("Content-type", "application/json")
-                .body(user)
-                .post("/api/auth/register");
+        Response response = register(user);
 
         response.then()
                 .assertThat().statusCode(403)
@@ -98,10 +84,7 @@ public class TestCreateUser {
     @Test
     public void testCreateUserNotFillName() {
         user.setName("");
-        Response response = given()
-                .header("Content-type", "application/json")
-                .body(user)
-                .post("/api/auth/register");
+        Response response = register(user);
 
         response.then()
                 .assertThat().statusCode(403)
