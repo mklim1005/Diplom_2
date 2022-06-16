@@ -26,7 +26,6 @@ public class TestLogInUser {
     @After
     public void deleteUser() {
         String accessToken = loginAndGetToken(user);
-
         if (accessToken == null) {
             System.out.println("Skip delete user");
         } else {
@@ -42,12 +41,12 @@ public class TestLogInUser {
                 .assertThat().statusCode(200)
                 .assertThat().body("user.email", equalTo(user.getEmail().toLowerCase()))
                 .assertThat().body("user.name", equalTo(user.getName()));
-
     }
 
     @Test
     public void testLogInWrongEmail() {
         user.setEmail("");
+
         Response responseLogin = login(user);
 
         responseLogin.then()
@@ -59,6 +58,7 @@ public class TestLogInUser {
     @Test
     public void testLogInWrongPassword() {
         user.setPassword("");
+
         Response responseLogin = login(user);
 
         responseLogin.then()

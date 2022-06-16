@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
+import static helpers.OrderHelper.*;
 import static helpers.AuthHelper.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -26,20 +27,8 @@ public class TestOrderCreation {
         user = new User(email, password, name);
         register(user).then().assertThat().statusCode(200);
 
-        //get all ingredients and pick 2 random
-        Response response = given()
-                .header("Content-type", "application/json")
-                .get("/api/ingredients");
-        response.then().assertThat().statusCode(200)
-                .assertThat().body("success", equalTo(true));
-        //create order with random ingredients
-        GetIngredientsResponse getIngredientsResponse = response.body().as(GetIngredientsResponse.class);
-        int size = getIngredientsResponse.getData().size();
-        String id = getIngredientsResponse.getData().get(1).get_id();
-        int random1 = (int) (Math.random() * (size));
-        int random2 = (int) (Math.random() * (size));
-        String firstRandomIngredient = getIngredientsResponse.getData().get(random1).get_id();
-        String secondRandomIngredient = getIngredientsResponse.getData().get(random2).get_id();
+        String firstRandomIngredient = getRandomIngredientUuid();
+        String secondRandomIngredient = getRandomIngredientUuid();
         ArrayList<String> ingredients = new ArrayList<>();
         ingredients.add(firstRandomIngredient);
         ingredients.add(secondRandomIngredient);
@@ -49,7 +38,6 @@ public class TestOrderCreation {
     @After
     public void deleteUser() {
         String accessToken = loginAndGetToken(user);
-
         if (accessToken == null) {
             System.out.println("Skip delete user");
         } else {
@@ -61,9 +49,7 @@ public class TestOrderCreation {
     public void createOrderWithoutAuthorization() {
         Response response = given()
                 .header("Content-type", "application/json")
-                .and()
                 .body(order)
-                .when()
                 .post("/api/orders");
 
         response.then()
@@ -82,9 +68,7 @@ public class TestOrderCreation {
         Response response = given()
                 .header("Content-type", "application/json")
                 .header("Authorization", accessToken)
-                .and()
                 .body(order)
-                .when()
                 .post("/api/orders");
 
         response.then()
@@ -103,9 +87,7 @@ public class TestOrderCreation {
 
         Response response = given()
                 .header("Content-type", "application/json")
-                .and()
                 .body(order)
-                .when()
                 .post("/api/orders");
 
         response.then()
@@ -123,9 +105,7 @@ public class TestOrderCreation {
 
         Response response = given()
                 .header("Content-type", "application/json")
-                .and()
                 .body(order)
-                .when()
                 .post("/api/orders");
 
         response.then().assertThat().statusCode(500);
