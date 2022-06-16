@@ -1,4 +1,7 @@
+package praktikum;
+
 import io.restassured.response.Response;
+import praktikum.User;
 
 import static io.restassured.RestAssured.given;
 

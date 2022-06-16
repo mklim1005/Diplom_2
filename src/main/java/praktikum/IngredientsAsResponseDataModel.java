@@ -1,3 +1,5 @@
+package praktikum;
+
 public class IngredientsAsResponseDataModel {
     private String _id;
     private String name;
