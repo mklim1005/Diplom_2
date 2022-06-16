@@ -7,9 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-
 import static helpers.AuthHelper.*;
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 public class TestLogInUser {
@@ -22,7 +20,7 @@ public class TestLogInUser {
     public void setUp() {
         user = new User(email, password, name);
         RestAssured.baseURI = "https://stellarburgers.nomoreparties.site";
-     register(user).then().assertThat().statusCode(200);
+        register(user).then().assertThat().statusCode(200);
     }
 
     @After

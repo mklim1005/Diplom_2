@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
-
+import static helpers.AuthHelper.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
@@ -23,34 +23,21 @@ public class TestOrderCreation {
     @Before
     public void setUp() {
         RestAssured.baseURI = "https://stellarburgers.nomoreparties.site";
-        //create user for registered tests
         user = new User(email, password, name);
-        //register user
-        RestAssured.baseURI = "https://stellarburgers.nomoreparties.site";
-        Response response1 = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(user)
-                .when()
-                .post("/api/auth/register");
-        response1.then().assertThat().statusCode(200)
-                .and()
-                .assertThat().body("success", equalTo(true));
-
+        register(user).then().assertThat().statusCode(200);
 
         //get all ingredients and pick 2 random
         Response response = given()
                 .header("Content-type", "application/json")
                 .get("/api/ingredients");
         response.then().assertThat().statusCode(200)
-                .and()
                 .assertThat().body("success", equalTo(true));
         //create order with random ingredients
         GetIngredientsResponse getIngredientsResponse = response.body().as(GetIngredientsResponse.class);
         int size = getIngredientsResponse.getData().size();
         String id = getIngredientsResponse.getData().get(1).get_id();
-        int random1 = (int) (Math.random() * (size - 0)) + 0;
-        int random2 = (int) (Math.random() * (size - 0)) + 0;
+        int random1 = (int) (Math.random() * (size));
+        int random2 = (int) (Math.random() * (size));
         String firstRandomIngredient = getIngredientsResponse.getData().get(random1).get_id();
         String secondRandomIngredient = getIngredientsResponse.getData().get(random2).get_id();
         ArrayList<String> ingredients = new ArrayList<>();
@@ -61,26 +48,12 @@ public class TestOrderCreation {
 
     @After
     public void deleteUser() {
-        Response responseLogin = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(user)
-                .when()
-                .post("/api/auth/login");
-        String accessToken;
-        accessToken = responseLogin.body().jsonPath().getString("accessToken");
+        String accessToken = loginAndGetToken(user);
 
         if (accessToken == null) {
             System.out.println("Skip delete user");
         } else {
-            Response responseDelete = given()
-                    .header("Authorization", accessToken)
-                    .delete("/api/auth/user");
-            responseDelete.then().assertThat().statusCode(202)
-                    .and()
-                    .assertThat().body("success", equalTo(true))
-                    .and()
-                    .assertThat().body("message", equalTo("User successfully removed"));
+            delete(accessToken).then().assertThat().statusCode(202);
         }
     }
 
@@ -93,7 +66,8 @@ public class TestOrderCreation {
                 .when()
                 .post("/api/orders");
 
-        response.then().assertThat().statusCode(200)
+        response.then()
+                .assertThat().statusCode(200)
                 .assertThat().body("success", equalTo(true))
                 .assertThat().body("$", hasKey("name"))
                 .assertThat().body("order", hasKey("number"))
@@ -103,14 +77,7 @@ public class TestOrderCreation {
 
     @Test
     public void createOrderWithAuthorization() {
-        Response responseLogin = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(user)
-                .when()
-                .post("/api/auth/login");
-        String accessToken;
-        accessToken = responseLogin.body().jsonPath().getString("accessToken");
+        String accessToken = loginAndGetToken(user);
 
         Response response = given()
                 .header("Content-type", "application/json")
@@ -120,7 +87,8 @@ public class TestOrderCreation {
                 .when()
                 .post("/api/orders");
 
-        response.then().assertThat().statusCode(200)
+        response.then()
+                .assertThat().statusCode(200)
                 .assertThat().body("success", equalTo(true))
                 .assertThat().body("$", hasKey("name"))
                 .assertThat().body("order", hasKey("number"))
@@ -140,7 +108,8 @@ public class TestOrderCreation {
                 .when()
                 .post("/api/orders");
 
-        response.then().assertThat().statusCode(400)
+        response.then()
+                .assertThat().statusCode(400)
                 .assertThat().body("success", equalTo(false))
                 .assertThat().body("message", equalTo("Ingredient ids must be provided"));
     }
