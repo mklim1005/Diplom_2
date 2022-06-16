@@ -1,4 +1,4 @@
-package praktikum;
+package helpers;
 
 import io.restassured.response.Response;
 import praktikum.User;

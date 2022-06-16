@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static helpers.AuthHelper.loginAndGetToken;
 
 public class TestChangeUserData {
     public String email = RandomStringUtils.randomAlphabetic(10) + "@mailinator.com";
@@ -29,7 +30,7 @@ public class TestChangeUserData {
 
     @After
     public void deleteUser() {
-        String accessToken = AuthHelper.loginAndGetToken(user);
+        String accessToken = loginAndGetToken(user);
         if (accessToken == null) {
             System.out.println("Skip delete user");
         } else {
@@ -42,7 +43,7 @@ public class TestChangeUserData {
 
     @Test
     public void testChangeUserDataNameAuthorized() {
-        String accessToken = AuthHelper.loginAndGetToken(user);
+        String accessToken = loginAndGetToken(user);
         String newName = RandomStringUtils.randomAlphabetic(10);
 
         Response response = given()
@@ -59,7 +60,7 @@ public class TestChangeUserData {
 
     @Test
     public void testChangeUserDataEmailAuthorized() {
-        String accessToken = AuthHelper.loginAndGetToken(user);
+        String accessToken = loginAndGetToken(user);
         String newEmail = RandomStringUtils.randomAlphabetic(10) + "@mailinator.com";
 
         Response response = given()
